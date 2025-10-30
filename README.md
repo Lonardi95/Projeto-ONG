@@ -26,7 +26,7 @@ A arquitetura do projeto é uma **Single Page Application (SPA)** construída co
     * Atributos WAI-ARIA para leitores de tela (especialmente no menu de navegação).
     * Contraste de cores validado.
 * **Modo Escuro / Claro:** Um seletor de tema acessível que salva a preferência do usuário no `localStorage`.
-* **Otimização para Produção:** Todos os arquivos (HTML, CSS, JS) são minificados e as imagens são comprimidas para performance máxima.
+* **Otimização para Produção:** As imagens são comprimidas para performance máxima.
 
 ---
 
@@ -65,10 +65,10 @@ Este projeto foi construído de forma incremental, simulando um ambiente de dese
     * Implementação da estratégia GitFlow (`main`, `develop`, `feature`).
     * Conformidade com WCAG 2.1 (ARIA, navegação por teclado).
     * Implementação do Modo Escuro acessível.
-    * Otimização de imagens e minificação de arquivos para produção.
+    * Otimização de imagens e de arquivos para produção.
 
 ---
 
 ## Autor
 
-Desenvolvido por **Augusto Lonardi** como parte do curso de Desenvolvimento Front End.
+Desenvolvido por **Augusto Lonardi** como parte do curso de Desenvolvimento Front End em Análise e Desenvolvimento de Sistemas | Cruzeiro do Sul | Universidade de Franca
