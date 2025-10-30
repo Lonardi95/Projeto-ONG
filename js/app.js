@@ -1,25 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Elementos principais da "casca"
     const appRoot = document.getElementById('app-root');
     const navMenu = document.querySelector('.nav-menu');
     const navToggle = document.querySelector('.nav-toggle');
 
-    // ===================================================================
-    // 1. REQUISITO: Sistema de SPA (Single Page Application) Básico
-    // ===================================================================
-
-    // Mapeia o 'data-page' (do link) para o arquivo HTML (o "template")
     const routes = {
         'inicio': 'pages/inicio.html',
         'projetos': 'pages/projetos.html',
         'cadastro': 'pages/cadastro.html',
-        'contato': null // 'contato' é um link de âncora especial
+        'contato': null
     };
 
-    /**
-     * Carrega o conteúdo da página (template) via fetch
-     */
     async function loadPage(page) {
         if (page === 'contato') {
             document.getElementById('contato').scrollIntoView({ behavior: 'smooth' });
@@ -29,27 +20,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const path = routes[page];
         if (!path) {
             console.error(`Rota não encontrada: ${page}`);
-            loadPage('inicio'); 
+            loadPage('inicio');
             return;
         }
 
         try {
             const response = await fetch(path);
             if (!response.ok) throw new Error('Falha ao carregar a página.');
-            
+
             const html = await response.text();
             appRoot.innerHTML = html;
-            
-            // Executa scripts específicos para a página que acabamos de carregar
+
             executePageScripts(page);
-            
+
             updateActiveLink(page);
-            
+
             if (navMenu.classList.contains('is-active')) {
                 navMenu.classList.remove('is-active');
                 navToggle.classList.remove('is-active');
-                // Corrigido: Atualiza ARIA no fechamento
-                navToggle.setAttribute('aria-expanded', false); 
+                navToggle.setAttribute('aria-expanded', false);
             }
 
         } catch (error) {
@@ -58,9 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Atualiza qual link está com a classe 'active' no menu
-     */
     function updateActiveLink(page) {
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
@@ -70,40 +56,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /**
-     * Lida com cliques nos links da navegação
-     */
     function handleNavClick(event) {
         const targetLink = event.target.closest('.nav-link');
-        
+
         if (targetLink) {
-            event.preventDefault(); 
+            event.preventDefault();
             const page = targetLink.dataset.page;
-            
+
             if (page !== 'contato') {
                 window.location.hash = page;
             } else {
-                loadPage('contato'); 
+                loadPage('contato');
             }
         }
     }
 
-    /**
-     * Lida com a mudança de hash na URL (ex: F5, link direto, botão "voltar")
-     */
     function handleHashChange() {
         const page = window.location.hash.substring(1) || 'inicio';
-        
+
         if (routes[page] !== undefined) {
             loadPage(page);
         } else {
-            loadPage('inicio'); 
+            loadPage('inicio');
         }
     }
-
-    // ===================================================================
-    // 2. REQUISITO: Sistema de "Templates" e Validação
-    // ===================================================================
 
     function executePageScripts(page) {
         if (page === 'cadastro') {
@@ -113,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initCadastroPage() {
         const form = document.getElementById('cadastro-form');
-        if (!form) return; 
+        if (!form) return;
 
         try {
             IMask(document.getElementById('cep'), { mask: '00000-000' });
@@ -128,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn("IMask.js não foi carregado ou falhou.", e);
         }
 
-        form.addEventListener('submit', function(event) {
+        form.addEventListener('submit', function (event) {
             event.preventDefault();
             if (validateForm(form)) {
                 alert('Formulário enviado com sucesso! (Simulação)');
@@ -142,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function validateForm(form) {
         let isFormValid = true;
-        const inputs = form.querySelectorAll('[required]'); 
+        const inputs = form.querySelectorAll('[required]');
 
         inputs.forEach(input => {
             input.classList.remove('is-valid', 'is-invalid');
@@ -150,25 +126,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 input.classList.add('is-valid');
             } else {
                 input.classList.add('is-invalid');
-                isFormValid = false; 
+                isFormValid = false;
             }
         });
 
         return isFormValid;
     }
 
-
-    // ===================================================================
-    // 2.5 REQUISITO: Modo Escuro (Acessibilidade - Entrega IV)
-    // ===================================================================
-    
-    // Esta função é definida aqui
     function initThemeToggle() {
         const themeToggle = document.getElementById('theme-toggle');
-        
+
         if (!themeToggle) {
-            console.error("Botão 'theme-toggle' não encontrado!"); // Segurança
-            return; 
+            console.error("Botão 'theme-toggle' não encontrado!");
+            return;
         }
 
         const applyTheme = (theme) => {
@@ -186,32 +156,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         themeToggle.addEventListener('click', () => {
             currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
-            localStorage.setItem('theme', currentTheme); 
+            localStorage.setItem('theme', currentTheme);
             applyTheme(currentTheme);
         });
     }
 
-    // ===================================================================
-    // 3. INICIALIZAÇÃO (Onde tudo é "ligado")
-    // ===================================================================
-    
-    // Adiciona o listener para o menu hambúrguer (COM ARIA)
     navToggle.addEventListener('click', () => {
-        const isActive = navMenu.classList.toggle('is-active'); 
+        const isActive = navMenu.classList.toggle('is-active');
         navToggle.classList.toggle('is-active');
         navToggle.setAttribute('aria-expanded', isActive);
     });
 
-    // Adiciona o listener para os cliques na navegação (para o roteador)
     document.querySelector('.main-header').addEventListener('click', handleNavClick);
-    
-    // Adiciona o listener para mudanças de hash (F5, voltar, etc.)
+
     window.addEventListener('hashchange', handleHashChange);
 
-    // CHAMA a função para ligar o botão de tema
     initThemeToggle();
 
-    // Carrega a página inicial (ou a página do hash)
     handleHashChange();
-    
-}); // Fim do 'DOMContentLoaded'
+
+}); /
