@@ -583,3 +583,105 @@ main { grid-row: 2; }
 @media (min-width: 1400px) {
     .container { max-width: 1320px; }
 }
+/* ===================================================================
+   7. ACESSIBILIDADE E MODO ESCURO (Entrega IV)
+=================================================================== */
+
+/* --- Estilo do Botão de Tema --- */
+.theme-toggle-wrapper {
+    /* No desktop, alinha o botão à direita dos links */
+    margin-left: var(--spacing-2);
+}
+
+.theme-toggle {
+    background-color: var(--color-neutral-light);
+    border: 1px solid var(--color-neutral-medium);
+    color: var(--color-black);
+    padding: var(--spacing-1);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--font-size-md); /* Tamanho do ícone */
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-speed);
+}
+.theme-toggle:hover {
+    background-color: var(--color-neutral-medium);
+}
+
+/* Esconde o ícone da lua por padrão (Modo Claro) */
+.theme-toggle .icon-moon { display: none; }
+.theme-toggle .icon-sun { display: block; }
+
+/* No mobile, o botão fica com largura total */
+@media (max-width: 991px) {
+    .theme-toggle-wrapper {
+        margin-left: 0;
+        margin-top: var(--spacing-2);
+    }
+    .theme-toggle {
+        width: 100%;
+        padding: var(--spacing-2);
+    }
+}
+
+
+/* --- Variáveis do MODO ESCURO --- */
+/* A classe .dark-mode será aplicada ao <body> pelo JavaScript */
+body.dark-mode {
+    /* 1. Inverte as cores básicas */
+    --color-neutral-light: #2d3436;  /* Fundo claro vira cinza escuro */
+    --color-black: #dfe6e9;         /* Texto preto vira cinza claro */
+    --color-white: #121212;         /* Fundo branco vira preto */
+    
+    /* 2. Inverte as cores neutras */
+    --color-neutral-medium: #636e72;  /* Bordas claras viram escuras */
+    --color-neutral-dark: #b2bec3;   /* Texto secundário */
+
+    /* 3. Ajuste no primário para manter contraste (WCAG AA) */
+    --color-primary: #007bff; /* Um azul um pouco mais claro */
+}
+
+/* --- Ajustes finos para o MODO ESCURO --- */
+
+/* Sombras e Cards */
+body.dark-mode .main-header,
+body.dark-mode .card {
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}
+
+/* Botão de Tema no Modo Escuro */
+body.dark-mode .theme-toggle {
+    background-color: var(--color-neutral-light);
+    border-color: var(--color-neutral-medium);
+    color: var(--color-black); /* Cor do ícone (agora claro) */
+}
+
+/* Controla os ícones do botão */
+body.dark-mode .theme-toggle .icon-moon { display: block; }
+body.dark-mode .theme-toggle .icon-sun { display: none; }
+
+/* Garante contraste no botão de contato */
+body.dark-mode .nav-menu a.btn-primary {
+    color: var(--color-white); /* Texto branco no botão azul */
+}
+
+/* Ajusta seções .bg-light (que agora devem ser escuras) */
+body.dark-mode .bg-light {
+    background-color: var(--color-neutral-light) !important;
+}
+
+/* Alertas */
+body.dark-mode .alert-success {
+    color: #c3e6cb;
+    background-color: #155724;
+    border-color: #1a6b2e;
+}
+
+body.dark-mode .alert-danger {
+    color: #f5c6cb;
+    background-color: #721c24;
+    border-color: #8a2a32;
+}
