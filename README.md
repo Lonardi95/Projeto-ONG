@@ -70,6 +70,6 @@ Este projeto foi construído de forma incremental, simulando um ambiente de dese
 
 ---
 
-## 👨‍💻 Autor
+## Autor
 
 Desenvolvido por **Augusto Lonardi** como parte do curso de Desenvolvimento Front End.
