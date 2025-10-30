@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
      * Carrega o conteúdo da página (template) via fetch
      */
     async function loadPage(page) {
-        // Se a rota for 'contato', apenas rola para o rodapé
         if (page === 'contato') {
             document.getElementById('contato').scrollIntoView({ behavior: 'smooth' });
             return;
@@ -30,31 +29,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const path = routes[page];
         if (!path) {
             console.error(`Rota não encontrada: ${page}`);
-            loadPage('inicio'); // Carrega a página inicial como padrão
+            loadPage('inicio'); 
             return;
         }
 
         try {
-            // 1. Busca o conteúdo do arquivo HTML
             const response = await fetch(path);
             if (!response.ok) throw new Error('Falha ao carregar a página.');
             
             const html = await response.text();
-            
-            // 2. Injeta o HTML dentro do <main id="app-root">
             appRoot.innerHTML = html;
             
-            // 3. REQUISITO: Sistema de templates JavaScript
-            //    Executa scripts específicos para a página que acabamos de carregar
+            // Executa scripts específicos para a página que acabamos de carregar
             executePageScripts(page);
             
-            // Atualiza o link ativo no menu
             updateActiveLink(page);
             
-            // Fecha o menu hambúrguer no mobile após clicar
             if (navMenu.classList.contains('is-active')) {
                 navMenu.classList.remove('is-active');
                 navToggle.classList.remove('is-active');
+                // Corrigido: Atualiza ARIA no fechamento
+                navToggle.setAttribute('aria-expanded', false); 
             }
 
         } catch (error) {
@@ -79,18 +74,16 @@ document.addEventListener('DOMContentLoaded', () => {
      * Lida com cliques nos links da navegação
      */
     function handleNavClick(event) {
-        // Encontra o link clicado, mesmo que clique no ícone dentro dele
         const targetLink = event.target.closest('.nav-link');
         
         if (targetLink) {
-            event.preventDefault(); // Impede a navegação padrão
+            event.preventDefault(); 
             const page = targetLink.dataset.page;
             
-            // Atualiza o hash (URL) sem recarregar, exceto para 'contato'
             if (page !== 'contato') {
                 window.location.hash = page;
             } else {
-                loadPage('contato'); // Apenas rola para o contato
+                loadPage('contato'); 
             }
         }
     }
@@ -99,13 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
      * Lida com a mudança de hash na URL (ex: F5, link direto, botão "voltar")
      */
     function handleHashChange() {
-        // Pega o hash (ex: #inicio) e remove o '#'
         const page = window.location.hash.substring(1) || 'inicio';
         
         if (routes[page] !== undefined) {
             loadPage(page);
         } else {
-            loadPage('inicio'); // Página padrão
+            loadPage('inicio'); 
         }
     }
 
@@ -113,24 +105,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. REQUISITO: Sistema de "Templates" e Validação
     // ===================================================================
 
-    /**
-     * Executa scripts específicos DEPOIS que o HTML da página é carregado
-     */
     function executePageScripts(page) {
         if (page === 'cadastro') {
-            // A página de cadastro precisa inicializar as máscaras e a validação
             initCadastroPage();
         }
     }
 
-    /**
-     * Inicializa todas as lógicas da página de Cadastro
-     */
     function initCadastroPage() {
         const form = document.getElementById('cadastro-form');
-        if (!form) return; // Segurança
+        if (!form) return; 
 
-        // 1. Ativa as Máscaras (IMask.js)
         try {
             IMask(document.getElementById('cep'), { mask: '00000-000' });
             IMask(document.getElementById('cpf'), { mask: '000.000.000-00' });
@@ -144,42 +128,29 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn("IMask.js não foi carregado ou falhou.", e);
         }
 
-        // 2. REQUISITO: Sistema de verificação de consistência (JS)
         form.addEventListener('submit', function(event) {
-            // Impede o envio real do formulário
             event.preventDefault();
-
             if (validateForm(form)) {
-                // Se tudo estiver válido
                 alert('Formulário enviado com sucesso! (Simulação)');
                 form.reset();
                 form.querySelectorAll('.is-valid').forEach(el => el.classList.remove('is-valid'));
             } else {
-                // Se houver erros
                 alert('Por favor, corrija os erros no formulário.');
             }
         });
     }
 
-    /**
-     * REQUISITO: Função de validação de consistência via JavaScript
-     * Retorna 'true' se o formulário for válido, 'false' se não.
-     */
     function validateForm(form) {
         let isFormValid = true;
-        const inputs = form.querySelectorAll('[required]'); // Pega todos que são obrigatórios
+        const inputs = form.querySelectorAll('[required]'); 
 
         inputs.forEach(input => {
-            // Limpa classes antigas
             input.classList.remove('is-valid', 'is-invalid');
-
-            // Usa a API de validação do HTML5 (checkValidity)
-            // que já verifica 'required', 'minlength', 'pattern', 'type=email', etc.
             if (input.checkValidity()) {
                 input.classList.add('is-valid');
             } else {
                 input.classList.add('is-invalid');
-                isFormValid = false; // Marca o formulário todo como inválido
+                isFormValid = false; 
             }
         });
 
@@ -188,13 +159,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ===================================================================
-    // 3. INICIALIZAÇÃO
+    // 2.5 REQUISITO: Modo Escuro (Acessibilidade - Entrega IV)
     // ===================================================================
+    
+    // Esta função é definida aqui
+    function initThemeToggle() {
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        if (!themeToggle) {
+            console.error("Botão 'theme-toggle' não encontrado!"); // Segurança
+            return; 
+        }
 
-    // Adiciona o listener para o menu hambúrguer
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.setAttribute('aria-label', 'Alternar modo claro');
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggle.setAttribute('aria-label', 'Alternar modo escuro');
+            }
+        };
+
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
+            localStorage.setItem('theme', currentTheme); 
+            applyTheme(currentTheme);
+        });
+    }
+
+    // ===================================================================
+    // 3. INICIALIZAÇÃO (Onde tudo é "ligado")
+    // ===================================================================
+    
+    // Adiciona o listener para o menu hambúrguer (COM ARIA)
     navToggle.addEventListener('click', () => {
-        navMenu.classList.toggle('is-active');
+        const isActive = navMenu.classList.toggle('is-active'); 
         navToggle.classList.toggle('is-active');
+        navToggle.setAttribute('aria-expanded', isActive);
     });
 
     // Adiciona o listener para os cliques na navegação (para o roteador)
@@ -203,6 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Adiciona o listener para mudanças de hash (F5, voltar, etc.)
     window.addEventListener('hashchange', handleHashChange);
 
-    // Carrega a página inicial ou a página do hash assim que o DOM carregar
+    // CHAMA a função para ligar o botão de tema
+    initThemeToggle();
+
+    // Carrega a página inicial (ou a página do hash)
     handleHashChange();
-});
+    
+}); // Fim do 'DOMContentLoaded'
